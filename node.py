@@ -1,37 +1,78 @@
-class Node:
+class Node(object):
 
-    def __init__():
-        self.output_nodes = []
-        self.input_nodes = []
+    def __init__(self):
+        self.node = True
 
-class InputNode(Node):
+    def is_input(self):
+        return isinstance(self, Input)
 
-    def __init__():
-        print(":)")
+    def is_hidden(self):
+        return isinstance(self, Hidden)
 
-class OutputNode(Node):
+    def is_output(self):
+        return isinstance(self, Output)
 
-    def __init__():
-        print(":)")
+class Input(Node):
 
-class HiddenNode(Node):
+    def __init__(self):
+        super().__init__()
 
-    def __init__():
-        print(":)")
+class Output(Node):
 
-class Connection:
+    def __init__(self):
+        super().__init__()
 
-    def __init(input_node, output_node):
-        self.input = input_node
-        self.output = output_node
-        self.weight = 0
+class Hidden(Node):
 
-class Network:
+    def __init__(self):
+        super().__init__()
 
-    def __init__():
+class Bias(Node):
+
+    def __init__(self):
+        super().__init__()
+
+class Connection(object):
+
+    def __init__(self, input, output, innovation):
+        self.input = input
+        self.output = output
+
+        self.weight = 1
+
+        self.enabled = True
+        self.innovation = innovation
+
+class Network(object):
+
+    def __init__(self, inputs, outputs):
+
+        self.inputs = []
+        self.hiddens = []
+        self.outputs = []
+        
         self.nodes = []
+        self.connections = []
 
-    def feed_forward():
+        for i in range(inputs):
+            node = Input()
+            self.inputs.append(node)
+            self.nodes.append(node)
+
+        for i in range(outputs):
+            node = Output()
+            self.outputs.append(node)
+            self.nodes.append(node)
+
+        for i in range(inputs):
+            for j in range(outputs):
+                connection = Connection(self.inputs[i], self.outputs[j])
+                self.connections.append(connection)
+
+    def feed_forward(inputs):
         return 0
+
         
+
         
+
