@@ -1,8 +1,20 @@
 from node import *
+from innovator import *
 
 class Network(object):
 
+    def next_node_innov(self):
+        self.node_innov += 1
+        return self.node_innov-1
+
+    def next_conn_innov(self):
+        self.conn_innov += 1
+        return self.conn_innov-1
+
     def __init__(self, inputs, outputs, fill=True):
+
+        self.node_innov = 0
+        self.conn_innov = 0
 
         self.hidden_layers = 0
 
@@ -16,7 +28,7 @@ class Network(object):
         self.outputs = []
 
         # bias node
-        self.bias = Bias()
+        self.bias = Bias(self.next_node_innov())
 
         # list of all nodes w/o bias
         self.nodes = []
@@ -32,28 +44,29 @@ class Network(object):
 
         if fill:
             for i in range(inputs):
-                node = Input()
+                node = Input(self.next_node_innov())
                 self.inputs.append(node)
                 self.nodes.append(node)
 
             for i in range(outputs):
-                node = Output()
+                node = Output(self.next_node_innov())
                 self.outputs.append(node)
                 self.nodes.append(node)
 
             for node in self.inputs:
                 self.node_conns[node] = []
 
+            for i in range(outputs):
+                connection = Connection(self.bias, self.outputs[i], self.next_conn_innov())
+                self.bias_connections.append(connection)
+
             for i in range(inputs):
                 for j in range(outputs):
-                    connection = Connection(self.inputs[i], self.outputs[j], 1)
+                    connection = Connection(self.inputs[i], self.outputs[j], self.next_conn_innov())
                     self.node_conns[self.inputs[i]].append(connection)
                     self.connections.append(connection)
 
-            for i in range(outputs):
-                connection = Connection(self.bias, self.outputs[i], 1)
-                self.bias_connections.append(connection)
-
+            
     def feed_forward(self, inputs):
         results = []
 
@@ -93,16 +106,16 @@ class Network(object):
         conn.enabled = False
 
         # create new node
-        node = Hidden()
+        node = Hidden(node_innovation(conn.input.num, conn.output.num))
         self.nodes.append(node)
 
         # give new node bias connection
-        b = Connection(self.bias, node, 1)
+        b = Connection(self.bias, node, conn_innovation(self.bias.num, node.num))
         self.bias_connections.append(b)
 
         # create two new connections
-        c1 = Connection(conn.input, node, 1)
-        c2 = Connection(node, conn.output, 1)
+        c1 = Connection(conn.input, node, conn_innovation(conn.input.num, node.num))
+        c2 = Connection(node, conn.output, conn_innovation(node.num, conn.output.num))
 
         self.connections.append(c1)
         self.connections.append(c2)
@@ -164,7 +177,7 @@ class Network(object):
             output_node = input_node
             input_node = temp
 
-        conn = Connection(input_node, output_node, 1)
+        conn = Connection(input_node, output_node, conn_innovation(input_node.num, output_node.num))
         self.connections.append(conn)
 
         self.node_conns[input_node].append(conn)
@@ -202,14 +215,43 @@ class Network(object):
             self.add_node()
 
     # Child will take the structure of this network
-    def crossover(self, net):
-        pass
+    def crossover(self, weak_parent):
+        child = self.replicate()
 
+        for conn in child.connections:
+
+            for weak_conn in weak_parent.connections:
+                if conn.num == weak_conn.num:
+                    if random.random() < 0.5:
+                        conn.weight = weak_conn.weight
+
+                    if not conn.enabled or not weak_conn.enabled:
+                        if random.random() < 0.75:
+                            conn.enabled = False
+                        else:
+                            conn.enabled = True 
+                    break
+
+        for conn in child.bias_connections:
+            for weak_conn in weak_parent.bias_connections:
+                if conn.num == weak_conn.num:
+                    if random.random() < 0.5:
+                        conn.weight = weak_conn.weight
+                    break
+
+
+
+        return child
+            
+        
     def replicate(self):
         clone = Network(len(self.inputs), len(self.outputs), fill=False)
 
         clone.hidden_layers = self.hidden_layers
         clone.bias = self.bias.replicate()
+
+        clone.node_innov = self.node_innov
+        clone.conn_innov = self.conn_innov
 
         temp_node_map = {}
 
@@ -228,19 +270,6 @@ class Network(object):
         for node in clone.inputs:
                 clone.node_conns[node] = []
 
-        '''
-        for i in range(len(clone.inputs)):
-            for j in range(len(clone.outputs)):
-                connection = Connection(clone.inputs[i], clone.outputs[j], 1)
-                clone.node_conns[clone.inputs[i]].append(connection)
-                clone.connections.append(connection)
-        
-
-        for i in range(len(clone.outputs)):
-            connection = Connection(clone.bias, clone.outputs[i], 1)
-            clone.bias_connections.append(connection)
-        '''
-
         for key in self.hiddens:
             node_list = []
             for node in self.hiddens[key]:
@@ -254,7 +283,7 @@ class Network(object):
         for conn in self.connections:
             in_node = temp_node_map[conn.input.num]
             out_node = temp_node_map[conn.output.num]
-            new_conn = Connection(in_node, out_node, 1, num=conn.num)
+            new_conn = Connection(in_node, out_node, next_conn_innov())
             new_conn.weight = conn.weight
             new_conn.enabled = conn.enabled
             clone.node_conns[in_node].append(new_conn)
@@ -262,40 +291,31 @@ class Network(object):
 
         for conn in self.bias_connections:
             out_node = temp_node_map[conn.output.num]
-            new_conn = Connection(clone.bias, out_node, 1, num=conn.num)
+            new_conn = Connection(clone.bias, out_node, next_conn_innov())
             new_conn.weight = conn.weight
             clone.bias_connections.append(new_conn)
             
-
-
         return clone
-            
-
-        
-                
-            
-
-        
-        
+                    
     def __repr__(self):
         s = "bias:\n"
         s += "  node " + str(self.bias.num) + "\n"
         for c in self.bias_connections:
-            s += "    conn " + str(c.num) + ": " + str(c.input.num) + " -> " + str(c.output.num) + "\n"
+            s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + "\n"
     
             
         s += "inputs:\n"
         for n in self.inputs:
             s += "  node " + str(n.num) + "\n"
             for c in self.node_conns[n]:
-                s += "    conn " + str(c.num) + ": " + str(c.input.num) + " -> " + str(c.output.num) + " enabled=" + str(c.enabled) + "\n"
+                s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + "\n"
 
         for layer in range(1, self.hidden_layers+1):
             s += "layer " + str(layer) + ":\n"
             for n in self.hiddens[layer]:
                 s += "  node " + str(n.num) + "\n"
                 for c in self.node_conns[n]:
-                    s += "    conn " + str(c.num) + ": " + str(c.input.num) + " -> " + str(c.output.num) + " enabled=" + str(c.enabled) + "\n"
+                    s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + "\n"
 
         s += "outputs:\n"
         for n in self.outputs:

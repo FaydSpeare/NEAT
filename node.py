@@ -1,21 +1,13 @@
 import random
 import math
 
-node_count = 0
-conn_count = 0
-
 class Node(object):
 
     def __init__(self, layer, num):
         self.layer = layer
 
-        if num == None:
-            global node_count
-            self.num = node_count
-            node_count += 1
-        else:
-            self.num = num
-
+        self.num = num
+        
         self.in_val = 0
         self.out_val = 0
 
@@ -33,7 +25,7 @@ class Node(object):
 
 class Input(Node):
 
-    def __init__(self, num=None):
+    def __init__(self, num):
         super().__init__(0, num)
 
     def activate(self):
@@ -45,7 +37,7 @@ class Input(Node):
 
 class Output(Node):
 
-    def __init__(self, num=None):
+    def __init__(self, num):
         super().__init__(1, num)
 
     def activate(self):
@@ -58,7 +50,7 @@ class Output(Node):
 
 class Hidden(Node):
 
-    def __init__(self, num=None):
+    def __init__(self, num):
         super().__init__(None, num)
 
     def activate(self):
@@ -71,7 +63,7 @@ class Hidden(Node):
 
 class Bias(Node):
 
-    def __init__(self, num=None):
+    def __init__(self, num):
         super().__init__(0, num)
         self.in_val = 1
 
@@ -85,7 +77,7 @@ class Bias(Node):
 
 class Connection(object):
 
-    def __init__(self, input, output, innovation, num=None):
+    def __init__(self, input, output, num):
         self.input = input
         self.output = output
 
@@ -93,12 +85,7 @@ class Connection(object):
 
         self.enabled = True
 
-        if num == None:
-            global conn_count
-            self.num = conn_count
-            conn_count += 1
-        else:
-            self.num = num
+        self.num = num
 
     def feed(self):
         if self.enabled:
