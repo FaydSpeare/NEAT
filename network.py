@@ -1,5 +1,6 @@
 from node import *
 from innovator import *
+from species import *
 
 class Network(object):
 
@@ -213,35 +214,6 @@ class Network(object):
 
         if random.random() < 0.01:
             self.add_node()
-
-    # Child will take the structure of this network
-    def crossover(self, weak_parent):
-        child = self.replicate()
-
-        for conn in child.connections:
-
-            for weak_conn in weak_parent.connections:
-                if conn.num == weak_conn.num:
-                    if random.random() < 0.5:
-                        conn.weight = weak_conn.weight
-
-                    if not conn.enabled or not weak_conn.enabled:
-                        if random.random() < 0.75:
-                            conn.enabled = False
-                        else:
-                            conn.enabled = True 
-                    break
-
-        for conn in child.bias_connections:
-            for weak_conn in weak_parent.bias_connections:
-                if conn.num == weak_conn.num:
-                    if random.random() < 0.5:
-                        conn.weight = weak_conn.weight
-                    break
-
-
-
-        return child
             
         
     def replicate(self):
