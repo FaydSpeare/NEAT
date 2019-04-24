@@ -85,9 +85,9 @@ class Species:
         progeny.mutate()
         return progeny
         
-THRESHOLD = 3.0
+THRESHOLD = 4.0
 ED_COEFF = 1
-W_COEFF = 0.5
+W_COEFF = 3.0
 
 def are_compatible(net1, net2):
     e_and_d = excess_and_disjoint(net1, net2)
@@ -96,8 +96,10 @@ def are_compatible(net1, net2):
     length = len(net1.connections)+len(net1.bias_connections) + len(net2.connections)+len(net2.bias_connections)
     
     N = 1
+    '''
     if length > 40:
         N = length
+    '''
 
     comp = ((ED_COEFF * e_and_d) / N) + (W_COEFF * w_diff)
     #print(comp)

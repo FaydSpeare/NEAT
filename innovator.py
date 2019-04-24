@@ -11,9 +11,15 @@ def setup_innovations(inputs, outputs):
     global node_innovations
     global conn_innovations
     global setup
+    global node_innov_dict
+    global conn_innov_dict
     
     node_innovations = (inputs + outputs + 1) - 1
     conn_innovations = ((inputs+1)*outputs) - 1
+
+    node_innov_dict = {}
+    conn_innov_dict = {}
+
     setup = True
 
 def node_innovation(before, after):

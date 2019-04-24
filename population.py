@@ -26,6 +26,8 @@ class Population(object):
             self.population.append(entity)
 
     def natural_selection(self):
+        random.seed(a=None)
+                    
         self.speciate()
         self.calculate_fitness()
         self.sort_species()
@@ -51,14 +53,7 @@ class Population(object):
 
         children = []
         if self.stale > 20 and len(self.species) > 1:
-            print("handy")
             no_of_children = math.floor(self.pop_size/2)-1
-            champ1 = self.best_entity.replicate()
-            champ2 = self.best_entity.replicate()
-            champ1.mutate()
-            champ2.mutate()
-            children.append(champ1)
-            children.append(champ2)
             for i in range(no_of_children):
                     children.append(self.species[0].progeny())
                     children.append(self.species[1].progeny())
@@ -78,7 +73,7 @@ class Population(object):
 
         self.population = children
         self.gen += 1
-        print("Gen: {} ~ Spec Count: {} ~ Current: {:.2f} ~ Best: {:.2f}".format(self.gen, len(self.species), self.gen_fitness, self.best_fitness))
+        print("Gen: {} ~ Spec Count: {} ~ Current: {:.2f} ~ Best: {:.2f} ~ Err: {}".format(self.gen, len(self.species), self.gen_fitness, self.best_fitness, self.best_entity.assess()))
         return False
         
     def speciate(self):

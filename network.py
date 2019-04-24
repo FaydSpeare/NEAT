@@ -87,23 +87,26 @@ class Network(object):
             node.activate()
             for conn in self.node_conns[node]:
                 conn.feed()
-            node.in_val = 0
-            node.out_val = 0
+            #node.in_val = 0
+            #node.out_val = 0
 
         for i in range(self.hidden_layers):
             for node in self.hiddens[i+1]:
                 node.activate()
                 for conn in self.node_conns[node]:
                     conn.feed()
-                node.in_val = 0
-                node.out_val = 0
+                #node.in_val = 0
+                #node.out_val = 0
 
         for node in self.outputs:
             node.activate()
             results.append(node.out_val)
-            node.in_val = 0
-            node.out_val = 0
+            #node.in_val = 0
+            #node.out_val = 0
 
+        for node in self.nodes:
+            node.out_val = 0
+            node.in_val = 0
         return results
 
     def add_node(self):
@@ -124,7 +127,7 @@ class Network(object):
 
         # give new node bias connection
         b = Connection(self.bias, node, conn_innovation(self.bias.num, node.num))
-        #b.weight = 0
+        b.weight = 0
         self.bias_connections.append(b)
 
         # create two new connections
@@ -218,7 +221,7 @@ class Network(object):
             conn.weight = random.gauss(0, 1)
 
     def mutate(self):
-        if random.random() < 0.8:
+        if random.random() < 0.95:
             for c in self.connections:
                 c.mutate_weight()
             for c in self.bias_connections:

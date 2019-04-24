@@ -24,15 +24,15 @@ class Entity:
         self.brain.mutate()
 
     def calculate_fitness(self):
-        res = self.think([0, 0])[0]
-        res += (self.think([0, 1])[0])
-        res += (self.think([1, 0])[0])
-        res += (1 - self.think([1, 1])[0])
+        res = (self.think([0, 0])[0])**3
+        res += (1 - self.think([0, 1])[0])**3
+        res += (1 - self.think([1, 0])[0])**3
+        res += (self.think([1, 1])[0])**3
 
         #if(res < 0.5):
             #print("\n\nGOT ONE\n")
         
-        self.fitness = (4-res)*(4-res)*50#random.randint(0, 100)
+        self.fitness = (4-res)*(4-res)#random.randint(0, 100)
 
     def replicate(self):
         clone = Entity(self.inputs, self.outputs)
@@ -41,11 +41,23 @@ class Entity:
         return clone
 
     def assess(self):
-        res = self.think([0, 0])[0]
+        err = 0
+        if self.think([0, 0])[0] > 0.5:
+            err += 1
+        if self.think([1, 0])[0] < 0.5:
+            err += 1
+        if self.think([0, 1])[0] < 0.5:
+            err += 1
+        if self.think([1, 1])[0] > 0.5:
+            err += 1
+        
+        '''
+        res = (self.think([0, 0])[0])
         res += (self.think([0, 1])[0])
-        res += (self.think([1, 0])[0])
+        res += (1 - self.think([1, 0])[0])
         res += (1 - self.think([1, 1])[0])
-        print("error =", res)
+        '''
+        return err
         
         
     

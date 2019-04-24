@@ -81,7 +81,7 @@ class Connection(object):
         self.input = input
         self.output = output
 
-        self.weight = random.random()*2 - 1
+        self.weight = random.gauss(0, 1)#random.random()*2 - 1
 
         self.enabled = True
 
@@ -92,16 +92,16 @@ class Connection(object):
             self.output.in_val += self.input.out_val * self.weight
 
     def mutate_weight(self):
-        if random.random() < 0.1:
-            self.weight = random.random()*2 - 1
-        else:
-            self.weight += random.gauss(0, 1) / 50
         
-        if self.weight > 1:
-            self.weight = 1
-        elif self.weight < -1:
-            self.weight = -1
-            
+        if random.random() < 0.1:
+            self.weight = random.gauss(0, 1)#random.random()*2 - 1
+        else:
+            self.weight += random.gauss(0, 1) / 100
+        
+        if self.weight > 3:
+            self.weight = 3
+        elif self.weight < -3:
+            self.weight = -3            
 
 
 
