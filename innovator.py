@@ -24,17 +24,17 @@ def node_innovation(before, after):
 
     if not setup: raise Exception()
 
-    print("Asking for", before, "to", after)
+    #print("Asking for", before, "to", after)
         
     tup = (before, after)
 
     if node_innov_dict.get(tup) != None:
-        print("gave", node_innov_dict[tup])
+        #print("gave", node_innov_dict[tup])
         return node_innov_dict[tup]
     else:
         node_innovations += 1
         node_innov_dict[tup] = node_innovations
-        print("gave", node_innovations)
+        #print("gave", node_innovations)
         return node_innovations
 
 def conn_innovation(start, end):

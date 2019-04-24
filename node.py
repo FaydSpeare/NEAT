@@ -41,7 +41,7 @@ class Output(Node):
         super().__init__(1, num)
 
     def activate(self):
-        self.out_val = 1 / (1 + math.exp(-4*self.in_val))
+        self.out_val = 1 / (1 + math.exp(-4.9*self.in_val))
 
     def replicate(self):
         node = Output(self.num)
@@ -54,7 +54,7 @@ class Hidden(Node):
         super().__init__(None, num)
 
     def activate(self):
-        self.out_val = 1 / (1 + math.exp(-4*self.in_val))
+        self.out_val = 1 / (1 + math.exp(-4.9*self.in_val))
     
     def replicate(self):
         node = Hidden(self.num)
@@ -95,7 +95,13 @@ class Connection(object):
         if random.random() < 0.1:
             self.weight = random.random()*2 - 1
         else:
-            self.weight += (random.random()*2 - 1) / 50
+            self.weight += random.gauss(0, 1) / 50
+        
+        if self.weight > 1:
+            self.weight = 1
+        elif self.weight < -1:
+            self.weight = -1
+            
 
 
 

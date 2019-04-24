@@ -19,6 +19,8 @@ class Network(object):
 
         self.hidden_layers = 0
 
+        self.node_innovations = set()
+
         # list of input nodes
         self.inputs = []
 
@@ -67,6 +69,9 @@ class Network(object):
                     self.node_conns[self.inputs[i]].append(connection)
                     self.connections.append(connection)
 
+            for n in self.nodes:
+                self.node_innovations.add(n.num)
+
             
     def feed_forward(self, inputs):
         results = []
@@ -83,6 +88,7 @@ class Network(object):
             for conn in self.node_conns[node]:
                 conn.feed()
             node.in_val = 0
+            node.out_val = 0
 
         for i in range(self.hidden_layers):
             for node in self.hiddens[i+1]:
@@ -90,11 +96,13 @@ class Network(object):
                 for conn in self.node_conns[node]:
                     conn.feed()
                 node.in_val = 0
+                node.out_val = 0
 
         for node in self.outputs:
             node.activate()
             results.append(node.out_val)
             node.in_val = 0
+            node.out_val = 0
 
         return results
 
@@ -103,15 +111,20 @@ class Network(object):
         # choose a random connection (not bias connection)
         conn = random.choice(self.connections)
 
+        while node_innovation(conn.input.num, conn.output.num) in self.node_innovations:
+            conn = random.choice(self.connections)
+
         # disable connection
         conn.enabled = False
 
         # create new node
         node = Hidden(node_innovation(conn.input.num, conn.output.num))
         self.nodes.append(node)
+        self.node_innovations.add(node.num)
 
         # give new node bias connection
         b = Connection(self.bias, node, conn_innovation(self.bias.num, node.num))
+        #b.weight = 0
         self.bias_connections.append(b)
 
         # create two new connections
@@ -135,7 +148,7 @@ class Network(object):
                 self.hiddens[node.layer] = [node]
                 
             else:
-                print("entered at ", node.layer)
+                #print("entered at ", node.layer)
                 for i in range(node.layer, self.hidden_layers + 1)[::-1]:
                     self.hiddens[i+1] = self.hiddens.pop(i)
 
@@ -153,6 +166,8 @@ class Network(object):
             self.hidden_layers += 1  
                 
         else:
+            if self.hiddens.get(node.layer) == None:
+                self.hiddens[node.layer] = [node]
             self.hiddens[node.layer].append(node)
 
         return
@@ -170,7 +185,7 @@ class Network(object):
             attempts += 1
 
         if attempts == 50:
-            print("failed attempt=50")
+            #print("failed attempt=50")
             return
 
         if input_node.layer > output_node.layer:
@@ -183,7 +198,7 @@ class Network(object):
 
         self.node_conns[input_node].append(conn)
 
-        print("success attempt=", attempts)
+        #print("success attempt=", attempts)
 
     def is_connection(self, n1, n2):
         if  n1 in self.node_conns:
@@ -209,7 +224,7 @@ class Network(object):
             for c in self.bias_connections:
                 c.mutate_weight()
 
-        if random.random() < 0.05:
+        if random.random() < 0.1:
             self.add_connection()
 
         if random.random() < 0.01:
@@ -249,13 +264,14 @@ class Network(object):
                 clone.node_conns[rep] = []
                 temp_node_map[rep.num] = rep
                 node_list.append(rep)
+                clone.nodes.append(rep)
 
             clone.hiddens[key] = node_list
 
         for conn in self.connections:
             in_node = temp_node_map[conn.input.num]
             out_node = temp_node_map[conn.output.num]
-            new_conn = Connection(in_node, out_node, next_conn_innov())
+            new_conn = Connection(in_node, out_node, conn.num)
             new_conn.weight = conn.weight
             new_conn.enabled = conn.enabled
             clone.node_conns[in_node].append(new_conn)
@@ -263,9 +279,12 @@ class Network(object):
 
         for conn in self.bias_connections:
             out_node = temp_node_map[conn.output.num]
-            new_conn = Connection(clone.bias, out_node, next_conn_innov())
+            new_conn = Connection(clone.bias, out_node, conn.num)
             new_conn.weight = conn.weight
             clone.bias_connections.append(new_conn)
+
+        for n in clone.nodes:
+                clone.node_innovations.add(n.num)
             
         return clone
                     
@@ -273,21 +292,21 @@ class Network(object):
         s = "bias:\n"
         s += "  node " + str(self.bias.num) + "\n"
         for c in self.bias_connections:
-            s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + "\n"
+            s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + " weight=" +str(c.weight)+"\n"
     
             
         s += "inputs:\n"
         for n in self.inputs:
             s += "  node " + str(n.num) + "\n"
             for c in self.node_conns[n]:
-                s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + "\n"
+                s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + " weight=" +str(c.weight)+"\n"
 
         for layer in range(1, self.hidden_layers+1):
             s += "layer " + str(layer) + ":\n"
             for n in self.hiddens[layer]:
                 s += "  node " + str(n.num) + "\n"
                 for c in self.node_conns[n]:
-                    s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + "\n"
+                    s += "    conn " + str(c.num).center(2) + ": " + str(c.input.num).center(2) + " -> " + str(c.output.num).center(2) + " enabled=" + str(c.enabled) + " weight=" +str(c.weight) + "\n"
 
         s += "outputs:\n"
         for n in self.outputs:

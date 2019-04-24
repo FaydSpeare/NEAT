@@ -1,10 +1,16 @@
 import random
+from network import *
 
 class Entity:
 
-    def __init__(self, inputs, outputs):
-        
-        self.brain = Network(inputs, outputs)
+    def __init__(self, inputs, outputs, net=None):
+        self.inputs = inputs
+        self.outputs = outputs
+
+        if net == None:
+            self.brain = Network(inputs, outputs)
+        else:
+            self.brain = net
 
         self.fitness = 0
         self.score = 0
@@ -18,7 +24,28 @@ class Entity:
         self.brain.mutate()
 
     def calculate_fitness(self):
-        self.fitness = random.randint(0, 100) 
+        res = self.think([0, 0])[0]
+        res += (self.think([0, 1])[0])
+        res += (self.think([1, 0])[0])
+        res += (1 - self.think([1, 1])[0])
+
+        #if(res < 0.5):
+            #print("\n\nGOT ONE\n")
+        
+        self.fitness = (4-res)*(4-res)*50#random.randint(0, 100)
+
+    def replicate(self):
+        clone = Entity(self.inputs, self.outputs)
+        clone.brain = self.brain.replicate()
+        clone.best_score = self.best_score
+        return clone
+
+    def assess(self):
+        res = self.think([0, 0])[0]
+        res += (self.think([0, 1])[0])
+        res += (self.think([1, 0])[0])
+        res += (1 - self.think([1, 1])[0])
+        print("error =", res)
         
         
     
