@@ -4,6 +4,10 @@ from species import *
 
 class Network(object):
 
+    W_MUT = 0.8
+    C_MUT = 0.1
+    N_MUT = 0.01
+
     def next_node_innov(self):
         self.node_innov += 1
         return self.node_innov-1
@@ -127,7 +131,7 @@ class Network(object):
 
         # give new node bias connection
         b = Connection(self.bias, node, conn_innovation(self.bias.num, node.num))
-        b.weight = 0
+        #b.weight = 0
         self.bias_connections.append(b)
 
         # create two new connections
@@ -221,16 +225,16 @@ class Network(object):
             conn.weight = random.gauss(0, 1)
 
     def mutate(self):
-        if random.random() < 0.95:
+        if random.random() < Network.W_MUT:
             for c in self.connections:
                 c.mutate_weight()
             for c in self.bias_connections:
                 c.mutate_weight()
 
-        if random.random() < 0.1:
+        if random.random() < Network.C_MUT:
             self.add_connection()
 
-        if random.random() < 0.01:
+        if random.random() < Network.N_MUT:
             self.add_node()
             
         
@@ -314,7 +318,6 @@ class Network(object):
         s += "outputs:\n"
         for n in self.outputs:
             s += "  node " + str(n.num) + "\n"
-        s += str(self.hidden_layers)
 
         return s
             

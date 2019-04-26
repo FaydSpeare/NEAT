@@ -4,6 +4,10 @@ from entity import *
 
 class Species:
 
+    THRESHOLD = 4.0
+    ED_COEFF = 1
+    W_COEFF = 3.0
+
     def __init__(self, first):
         self.entities = []
         
@@ -16,6 +20,8 @@ class Species:
         self.gen_fitness = 0
 
         self.entities.append(first)
+
+        self.colour = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
 
     def add(self, entity):
         self.entities.append(entity)
@@ -35,7 +41,7 @@ class Species:
 
     def calculate_fitness(self):
         for e in self.entities:
-            e.calculate_fitness()
+            e.calc_fitness()
 
     def cull(self):
         if len(self.entities) > 2:
@@ -78,16 +84,12 @@ class Species:
 
             if parent1.fitness < parent2.fitness:
                 brain = crossover(parent2.brain, parent1.brain)
-                progeny = Entity(parent1.inputs, parent1.outputs, net=brain)
+                progeny = parent2.child(brain)
             else:
                 brain = crossover(parent1.brain, parent2.brain)
-                progeny = Entity(parent1.inputs, parent1.outputs, net=brain)
+                progeny = parent1.child(brain)
         progeny.mutate()
         return progeny
-        
-THRESHOLD = 4.0
-ED_COEFF = 1
-W_COEFF = 3.0
 
 def are_compatible(net1, net2):
     e_and_d = excess_and_disjoint(net1, net2)
@@ -101,9 +103,9 @@ def are_compatible(net1, net2):
         N = length
     '''
 
-    comp = ((ED_COEFF * e_and_d) / N) + (W_COEFF * w_diff)
+    comp = ((Species.ED_COEFF * e_and_d) / N) + (Species.W_COEFF * w_diff)
     #print(comp)
-    return comp < THRESHOLD
+    return comp < Species.THRESHOLD
     
 def crossover(strong_parent, weak_parent):
     child = strong_parent.replicate()

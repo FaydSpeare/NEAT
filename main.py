@@ -1,46 +1,45 @@
-from population import *
-from innovator import *
+# IMPORT NEAT
+from neat import *
+from examples import *
 
-gen_sum = 0
-hid_sum = 0
-n = 50
 
-for i in range(n):
-    print("run", i)
+# MUTATION RATES
+weight = 0.9
+conn = 0.2
+node = 0.05
+mut_rates = (weight, conn, node)
 
-    setup_innovations(2, 1)
-    pop = Population(2, 1, 150)
+# SPECIES DIFFERENTIATION
+thresh = 4.0
+disjoint = 1.0
+weights = 3.0
+spec_diff = (thresh, disjoint, weights)
 
-    extinct = False
-    for i in range(1000):
-        if pop.natural_selection():
-            extinct = True
-            break
-        if pop.best_entity.assess() == 0:
-            break
+# COMBINED PARAMS
+params = [mut_rates, spec_diff]
 
-    if extinct:
-        continue
-        
-    e = pop.best_entity
+# Input/Output for Networks
+io = (7, 10)
+
+# Population Size
+size = 200
+
+# PLAYER SUBCLASS OF ENTITY
+Player = DIGITS
+
+# NEAT
+neat = Neat(io, Player, size, params=params)
+
+## ADD ASSESSMENT FUNCTION TO NEAT
+neat.stop_condition = digits_assessment
+
+neat.run()
+
+
+
+
+
+
     
-    gen_sum += pop.gen
-
-    hidden = len(e.brain.nodes) - 3
-    hid_sum += hidden
-
-    print(len(e.brain.nodes) - 3)
-    #print(e.brain)
-    print(pop.gen)
-
-print("Avg. Gen:", gen_sum/n, "Avg. Hiddens:", hid_sum/n)
-'''
-for s in pop.species:
-	print(s.entities[0].brain)
-	s.entities[0].assess()
-	s.entities[0].calculate_fitness()
-	print(s.entities[0].fitness)
-	print("num of creatures",len(s.entities))
-'''	
 
 

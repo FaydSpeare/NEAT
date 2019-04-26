@@ -4,10 +4,10 @@ import math
 
 class Population(object):
 
-    def __init__(self, inputs, outputs, pop_size):
-        self.inputs = inputs
-        self.outputs = outputs
-        self.pop_size = pop_size
+    def __init__(self, io, entity, size):
+        self.io = io
+        self.size = size
+        self.entity = entity
 
         self.population = []
         self.species = []
@@ -20,8 +20,8 @@ class Population(object):
 
         self.stale = 0
 
-        for i in range(pop_size):
-            entity = Entity(inputs, outputs)
+        for i in range(size):
+            entity = self.entity(io)
             entity.mutate()
             self.population.append(entity)
 
@@ -44,7 +44,7 @@ class Population(object):
         fitness_sum = self.get_average_sum()
 
         for spec in self.species:
-            if math.floor((spec.get_average_fitness() / fitness_sum) * self.pop_size) < 1:
+            if math.floor((spec.get_average_fitness() / fitness_sum) * self.size) < 1:
                 self.species.remove(spec)
 
         if len(self.species) == 0:
@@ -53,7 +53,7 @@ class Population(object):
 
         children = []
         if self.stale > 20 and len(self.species) > 1:
-            no_of_children = math.floor(self.pop_size/2)-1
+            no_of_children = math.floor(self.size/2)-1
             for i in range(no_of_children):
                     children.append(self.species[0].progeny())
                     children.append(self.species[1].progeny())
@@ -63,7 +63,7 @@ class Population(object):
         else:
             for spec in self.species:
                 
-                no_of_children = math.floor((spec.get_average_fitness() / fitness_sum) * self.pop_size)
+                no_of_children = math.floor((spec.get_average_fitness() / fitness_sum) * self.size)
                 
                 if no_of_children >= 5:
                     children.append(spec.champion.replicate())
@@ -73,7 +73,6 @@ class Population(object):
 
         self.population = children
         self.gen += 1
-        print("Gen: {} ~ Spec Count: {} ~ Current: {:.2f} ~ Best: {:.2f} ~ Err: {}".format(self.gen, len(self.species), self.gen_fitness, self.best_fitness, self.best_entity.assess()))
         return False
         
     def speciate(self):
