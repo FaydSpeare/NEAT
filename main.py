@@ -4,9 +4,9 @@ from examples import *
 
 
 # MUTATION RATES
-weight = 0.9
-conn = 0.2
-node = 0.05
+weight = 0.95
+conn = 0.1
+node = 0.01
 mut_rates = (weight, conn, node)
 
 # SPECIES DIFFERENTIATION
@@ -19,19 +19,19 @@ spec_diff = (thresh, disjoint, weights)
 params = [mut_rates, spec_diff]
 
 # Input/Output for Networks
-io = (7, 10)
+io = (2, 1)
 
 # Population Size
 size = 200
 
 # PLAYER SUBCLASS OF ENTITY
-Player = DIGITS
+Player = XOR
 
 # NEAT
 neat = Neat(io, Player, size, params=params)
 
 ## ADD ASSESSMENT FUNCTION TO NEAT
-neat.stop_condition = digits_assessment
+neat.stop_condition = xor_assessment
 
 neat.run()
 

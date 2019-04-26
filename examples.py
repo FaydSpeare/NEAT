@@ -6,10 +6,10 @@ class XOR(Entity):
 
     def calc_fitness(self):
         error = 0
-        error += (self.think([0,0])[0])
-        error += (1 - self.think([0,1])[0])
-        error += (1 - self.think([1,0])[0])
-        error += (self.think([1,1])[0])
+        error += (self.think([0,0])[0])**2
+        error += (1 - self.think([0,1])[0])**2
+        error += (1 - self.think([1,0])[0])**2
+        error += (self.think([1,1])[0])**2
         score = 4 - error
         self.fitness = score**2
 
@@ -22,6 +22,8 @@ def xor_assessment(e):
     if correct == 4:
         return True
     return False
+
+### DIGITS EXAMPLE ###
 
 class DIGITS(Entity):
 
