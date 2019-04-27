@@ -3,7 +3,6 @@ from innovator import *
 from entity import *
 from species import *
 from network import *
-import random
 
 class Neat:
 
@@ -52,6 +51,7 @@ class Neat:
             s += "| HighScore : {} ".format("{:.2f}".format(self.pop.best_fitness).ljust(8))
             s += "| No. Entities : {} ".format(str(len(self.pop.population)).ljust(3))
             print(s)
+        
 
     def run(self):
         if self.stop_condition == None:

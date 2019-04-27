@@ -42,7 +42,7 @@ class Population(object):
         # kill stale and bad species
 
         for spec in self.species:
-            if spec.stale > 15 and self.species.index(spec) + 1 >= self.elitism:
+            if spec.stale > 15 and (self.species.index(spec) + 1) >= self.elitism:
                 self.species.remove(spec)
 
         fitness_sum = self.get_average_sum()
@@ -68,7 +68,6 @@ class Population(object):
             for spec in self.species:
                 
                 no_of_children = math.floor((spec.get_average_fitness() / fitness_sum) * self.size)
-                #print(no_of_children)
                 if no_of_children >= 5:
                     children.append(spec.champion.replicate())
                     no_of_children -= 1

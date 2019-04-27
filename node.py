@@ -92,7 +92,6 @@ class Connection(object):
         self.weight = random.gauss(0, 1)#random.random()*2 - 1
 
         self.enabled = True
-
         self.num = num
 
     def feed(self):
@@ -106,10 +105,8 @@ class Connection(object):
         else:
             self.weight += random.gauss(0, 1) / 100
         
-        if self.weight > 3:
-            self.weight = 3
-        elif self.weight < -3:
-            self.weight = -3           
+        if self.weight > 3: self.weight = 3
+        elif self.weight < -3: self.weight = -3           
 
 
 
