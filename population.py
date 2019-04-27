@@ -12,6 +12,8 @@ class Population(object):
         self.population = []
         self.species = []
 
+        self.spec_innov = 0
+
         self.gen = 0
         self.best_fitness = 0
         self.gen_fitness = 0
@@ -19,6 +21,8 @@ class Population(object):
         self.best_entity = None
 
         self.stale = 0
+
+        self.elitism = 2
 
         for i in range(size):
             entity = self.entity(io)
@@ -38,7 +42,7 @@ class Population(object):
         # kill stale and bad species
 
         for spec in self.species:
-            if spec.stale > 15:
+            if spec.stale > 15 and self.species.index(spec) + 1 >= self.elitism:
                 self.species.remove(spec)
 
         fitness_sum = self.get_average_sum()
@@ -89,7 +93,8 @@ class Population(object):
                     break
 
             if not suitable_species:
-                self.species.append(Species(entity))
+                self.species.append(Species(entity, self.spec_innov))
+                self.spec_innov += 1
 
     def sort_species(self):
         for spec in self.species:

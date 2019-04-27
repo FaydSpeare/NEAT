@@ -72,5 +72,5 @@ def digits_assessment(e):
         return True
     if correct > 95:
         print("good")
-    print(correct)
+    #print(correct)
     return False

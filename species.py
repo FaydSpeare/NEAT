@@ -8,11 +8,13 @@ class Species:
     ED_COEFF = 1
     W_COEFF = 3.0
 
-    def __init__(self, first):
+    def __init__(self, first, innov):
         self.entities = []
         
         self.standard = first.brain.replicate()
         self.champion = first.replicate()
+
+        self.innov = innov
 
         self.best_fitness = 0
         self.stale = 0
