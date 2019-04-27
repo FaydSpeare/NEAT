@@ -33,7 +33,7 @@ neat = Neat(io, Player, size, params=params)
 ## ADD ASSESSMENT FUNCTION TO NEAT
 neat.stop_condition = xor_assessment
 
-#neat.run()
+neat.run()
 
 
 
