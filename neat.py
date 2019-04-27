@@ -5,13 +5,12 @@ from species import *
 from network import *
 import random
 
-
-
 class Neat:
 
     def __init__(self, io, entity, size, params=None, verbose=True):
         self.entity = entity
         self.check_entity()
+
         
         self.io = io
 
@@ -47,15 +46,12 @@ class Neat:
     def next(self):
         self.pop.natural_selection()
         if self.verbose:
-            
             s  = "| Gen : {} ".format(str(self.pop.gen).ljust(3))
             s += "| No. Species : {} ".format(str(len(self.pop.species)).ljust(3))
             s += "| Score : {} ".format("{:.2f}".format(self.pop.gen_fitness).ljust(8))
             s += "| HighScore : {} ".format("{:.2f}".format(self.pop.best_fitness).ljust(8))
+            s += "| No. Entities : {} ".format(str(len(self.pop.population)).ljust(3))
             print(s)
-            
-#print("Gen: {} ~ Spec Count: {} ~ Current: {:.2f} ~ Best: {:.2f}".format(self.gen, len(self.species), self.gen_fitness, self.best_fitness))
-            
 
     def run(self):
         if self.stop_condition == None:

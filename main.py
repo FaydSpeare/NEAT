@@ -4,15 +4,15 @@ from examples import *
 
 
 # MUTATION RATES
-weight = 0.95
-conn = 0.1
+weight = 0.8
+conn = 0.05
 node = 0.01
 mut_rates = (weight, conn, node)
 
 # SPECIES DIFFERENTIATION
-thresh = 4.0
+thresh = 3.0
 disjoint = 1.0
-weights = 3.0
+weights = 0.5
 spec_diff = (thresh, disjoint, weights)
 
 # COMBINED PARAMS
@@ -22,7 +22,7 @@ params = [mut_rates, spec_diff]
 io = (2, 1)
 
 # Population Size
-size = 200
+size = 500
 
 # PLAYER SUBCLASS OF ENTITY
 Player = XOR
@@ -34,7 +34,6 @@ neat = Neat(io, Player, size, params=params)
 neat.stop_condition = xor_assessment
 
 neat.run()
-
 
 
 
