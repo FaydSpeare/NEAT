@@ -131,7 +131,7 @@ class Network(object):
 
         # give new node bias connection
         b = Connection(self.bias, node, conn_innovation(self.bias.num, node.num))
-        #b.weight = 0
+        b.weight = 0
         self.bias_connections.append(b)
 
         # create two new connections

@@ -4,9 +4,9 @@ from examples import *
 
 
 # MUTATION RATES
-weight = 0.8
+weight = 0.95
 conn = 0.1
-node = 0.03
+node = 0.02
 mut_rates = (weight, conn, node)
 
 # SPECIES DIFFERENTIATION
@@ -22,7 +22,7 @@ params = [mut_rates, spec_diff]
 io = (2, 1)
 
 # Population Size
-size = 200
+size = 50
 
 # PLAYER SUBCLASS OF ENTITY
 Player = XOR
