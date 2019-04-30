@@ -85,12 +85,17 @@ class Bias(Node):
 
 class Connection(object):
 
+    WEIGHT_UB = 3
+    WEIGHT_LB = -3
+    WEIGHT_STEP = 0.01
+    WEIGHT_DIST = ('uniform', 0, 1)
+    RANDOM_WEIGHT = 0.1
+
     def __init__(self, input, output, num):
         self.input = input
         self.output = output
 
-        self.weight = random.gauss(0, 1)#random.random()*2 - 1
-
+        self.weight = self.rand()
         self.enabled = True
         self.num = num
 
@@ -99,14 +104,20 @@ class Connection(object):
             self.output.in_val += self.input.out_val * self.weight
 
     def mutate_weight(self):
-        
-        if random.random() < 0.1:
-            self.weight = random.gauss(0, 1)#random.random()*2 - 1
+        if random.random() < Connection.RANDOM_WEIGHT:
+            self.weight = self.rand()
         else:
-            self.weight += random.gauss(0, 1) / 100
+            self.weight += self.rand() * Connection.WEIGHT_STEP
         
-        if self.weight > 3: self.weight = 3
-        elif self.weight < -3: self.weight = -3           
+        if self.weight > Connection.WEIGHT_UB: self.weight = Connection.WEIGHT_UB
+        elif self.weight < Connection.WEIGHT_LB: self.weight = Connection.WEIGHT_LB
+
+    def rand(self):
+        if Connection.WEIGHT_DIST[0] == 'uniform':
+            width = (Connection.WEIGHT_DIST[2] - Connection.WEIGHT_DIST[1])
+            return (random.random() * width) + Connection.WEIGHT_DIST[1]
+        elif Connection.WEIGHT_DIST[0] == 'gaussian':
+            return random.gauss(Connection.WEIGHT_DIST[1], Connection.WEIGHT_DIST[2])
 
 
 

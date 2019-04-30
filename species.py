@@ -8,6 +8,10 @@ class Species:
     ED_COEFF = 1
     W_COEFF = 3.0
 
+    DUP_PARENT = 0.25
+    PARENT_WEIGHT = 0.5
+    GENE_ENABLE = 0.75
+
     def __init__(self, first, innov):
         self.entities = []
         
@@ -20,10 +24,7 @@ class Species:
         self.stale = 0
 
         self.gen_fitness = 0
-
         self.entities.append(first)
-
-        self.colour = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
 
     def add(self, entity):
         self.entities.append(entity)
@@ -78,7 +79,7 @@ class Species:
 
     def progeny(self):
         progeny = None
-        if random.random() < 0.25:
+        if random.random() < Species.DUP_PARENT:
             progeny = self.select_parent().replicate()
         else:
             parent1 = self.select_parent()
@@ -106,7 +107,6 @@ def are_compatible(net1, net2):
     '''
 
     comp = ((Species.ED_COEFF * e_and_d) / N) + (Species.W_COEFF * w_diff)
-    #print(comp)
     return comp < Species.THRESHOLD
     
 def crossover(strong_parent, weak_parent):
@@ -115,11 +115,11 @@ def crossover(strong_parent, weak_parent):
     for conn in child.connections:
         for weak_conn in weak_parent.connections:
             if conn.num == weak_conn.num:
-                if random.random() < 0.5:
+                if random.random() < Species.PARENT_WEIGHT:
                     conn.weight = weak_conn.weight
 
                 if not conn.enabled or not weak_conn.enabled:
-                    if random.random() < 0.75:
+                    if random.random() < Species.GENE_ENABLE:
                         conn.enabled = False
                     else:
                         conn.enabled = True 
@@ -128,7 +128,7 @@ def crossover(strong_parent, weak_parent):
     for conn in child.bias_connections:
         for weak_conn in weak_parent.bias_connections:
             if conn.num == weak_conn.num:
-                if random.random() < 0.5:
+                if random.random() < Species.PARENT_WEIGHT:
                     conn.weight = weak_conn.weight
                 break
     return child    

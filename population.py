@@ -4,6 +4,9 @@ import math
 
 class Population(object):
 
+    ELITE = 2
+    STALE = 15
+
     def __init__(self, io, entity, size):
         self.io = io
         self.size = size
@@ -21,8 +24,6 @@ class Population(object):
         self.best_entity = None
 
         self.stale = 0
-
-        self.elitism = 2
 
         for i in range(size):
             entity = self.entity(io)
@@ -42,7 +43,7 @@ class Population(object):
         # kill stale and bad species
 
         for spec in self.species:
-            if spec.stale > 15 and (self.species.index(spec) + 1) >= self.elitism:
+            if spec.stale > Population.STALE and (self.species.index(spec) + 1) >= Population.ELITE:
                 self.species.remove(spec)
 
         fitness_sum = self.get_average_sum()

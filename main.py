@@ -2,21 +2,35 @@
 from neat import *
 from examples import *
 
+config = {
+    
+    # MUTATION RATES
+    'weight_mut' : 0.95,
+    'connection_mut' : 0.1,
+    'node_mut' : 0.05,
+    'random_weight' : 0.1,
+    
+    # SPECIES DIFFERENTIATION
+    'threshold' : 3.0,
+    'disjoint' : 1.0,
+    'weights' : 0.5,
 
-# MUTATION RATES
-weight = 0.95
-conn = 0.1
-node = 0.02
-mut_rates = (weight, conn, node)
+    # CROSSOVER
+    'dup-parent' : 0.25,
+    'weak-parent-weight' : 0.5,
+    'gene-enable' : 0.75,
 
-# SPECIES DIFFERENTIATION
-thresh = 3.0
-disjoint = 1.0
-weights = 0.5
-spec_diff = (thresh, disjoint, weights)
+    # NATURAL SELECTION
+    'elite' : 2,
+    'stale' : 15,
 
-# COMBINED PARAMS
-params = [mut_rates, spec_diff]
+    # WEIGHTS
+    'weight_upper_bound' : 3,
+    'weight_lower_bound' : -3,
+    'weight_step' : 0.01,
+    'weight_distr' : ('gaussian', 0, 1)
+
+}
 
 # Input/Output for Networks
 io = (2, 1)
@@ -28,7 +42,7 @@ size = 50
 Player = XOR
 
 # NEAT
-neat = Neat(io, Player, size, params=params)
+neat = Neat(io, Player, size, config)
 
 ## ADD ASSESSMENT FUNCTION TO NEAT
 neat.stop_condition = xor_assessment
