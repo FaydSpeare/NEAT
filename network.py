@@ -1,6 +1,6 @@
-from node import *
-from innovator import *
-from species import *
+from node import Node, Input, Output, Hidden, Bias, Connection
+from innovator import node_innovation, conn_innovation
+import random
 
 class Network(object):
 

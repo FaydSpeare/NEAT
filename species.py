@@ -1,6 +1,6 @@
 import math
 import random
-from entity import *
+from entity import Entity
 
 class Species:
 
@@ -86,13 +86,74 @@ class Species:
             parent2 = self.select_parent()
 
             if parent1.fitness < parent2.fitness:
-                brain = crossover(parent2.brain, parent1.brain)
+                brain = Species.crossover(parent2.brain, parent1.brain)
                 progeny = parent2.child(brain)
             else:
-                brain = crossover(parent1.brain, parent2.brain)
+                brain = Species.crossover(parent1.brain, parent2.brain)
                 progeny = parent1.child(brain)
         progeny.mutate()
         return progeny
+
+    @staticmethod
+    def are_compatible(net1, net2):
+        e_and_d = Species.excess_and_disjoint(net1, net2)
+        w_diff = Species.weight_diff(net1, net2)
+
+        length = len(net1.connections)+len(net1.bias_connections) + len(net2.connections)+len(net2.bias_connections)
+        
+        N = 1
+
+        comp = ((Species.ED_COEFF * e_and_d) / N) + (Species.W_COEFF * w_diff)
+        return comp < Species.THRESHOLD
+
+    @staticmethod
+    def crossover(strong_parent, weak_parent):
+        child = strong_parent.replicate()
+
+        for conn in child.connections:
+            for weak_conn in weak_parent.connections:
+                if conn.num == weak_conn.num:
+                    if random.random() < Species.PARENT_WEIGHT:
+                        conn.weight = weak_conn.weight
+
+                    if not conn.enabled or not weak_conn.enabled:
+                        if random.random() < Species.GENE_ENABLE:
+                            conn.enabled = False
+                        else:
+                            conn.enabled = True 
+                    break
+
+        for conn in child.bias_connections:
+            for weak_conn in weak_parent.bias_connections:
+                if conn.num == weak_conn.num:
+                    if random.random() < Species.PARENT_WEIGHT:
+                        conn.weight = weak_conn.weight
+                    break
+        return child    
+
+    @staticmethod
+    def excess_and_disjoint(net1, net2):
+        matched = 0
+        for conn in net1.connections:
+            for other in net2.connections:
+                if other.num == conn.num:
+                    matched += 1
+                    break
+        return len(net1.connections) + len(net2.connections) - 2*matched  
+
+    @staticmethod
+    def weight_diff(net1, net2):
+        matched = 0
+        total = 0
+        for conn in net1.connections:
+            for other in net2.connections:
+                if other.num == conn.num:
+                    matched += 1
+                    total += abs(conn.weight - other.weight)
+                    break
+        if matched == 0:
+            return 100
+        return total/matched
 
     def __repr__(self):
         string = ""
@@ -102,66 +163,7 @@ class Species:
             string += repr(e) + "\n"
         return string
 
-def are_compatible(net1, net2):
-    e_and_d = excess_and_disjoint(net1, net2)
-    w_diff = weight_diff(net1, net2)
 
-    length = len(net1.connections)+len(net1.bias_connections) + len(net2.connections)+len(net2.bias_connections)
-    
-    N = 1
-    '''
-    if length > 40:
-        N = length
-    '''
-
-    comp = ((Species.ED_COEFF * e_and_d) / N) + (Species.W_COEFF * w_diff)
-    return comp < Species.THRESHOLD
-    
-def crossover(strong_parent, weak_parent):
-    child = strong_parent.replicate()
-
-    for conn in child.connections:
-        for weak_conn in weak_parent.connections:
-            if conn.num == weak_conn.num:
-                if random.random() < Species.PARENT_WEIGHT:
-                    conn.weight = weak_conn.weight
-
-                if not conn.enabled or not weak_conn.enabled:
-                    if random.random() < Species.GENE_ENABLE:
-                        conn.enabled = False
-                    else:
-                        conn.enabled = True 
-                break
-
-    for conn in child.bias_connections:
-        for weak_conn in weak_parent.bias_connections:
-            if conn.num == weak_conn.num:
-                if random.random() < Species.PARENT_WEIGHT:
-                    conn.weight = weak_conn.weight
-                break
-    return child    
-
-def excess_and_disjoint(net1, net2):
-    matched = 0
-    for conn in net1.connections:
-        for other in net2.connections:
-            if other.num == conn.num:
-                matched += 1
-                break
-    return len(net1.connections) + len(net2.connections) - 2*matched  
-
-def weight_diff(net1, net2):
-    matched = 0
-    total = 0
-    for conn in net1.connections:
-        for other in net2.connections:
-            if other.num == conn.num:
-                matched += 1
-                total += abs(conn.weight - other.weight)
-                break
-    if matched == 0:
-        return 100
-    return total/matched
 
 
     

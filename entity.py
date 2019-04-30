@@ -1,5 +1,5 @@
 import random
-from network import *
+from network import Network
 
 class Entity(object):
 

@@ -1,71 +1,116 @@
-from population import *
-from innovator import *
-from entity import *
-from species import *
-from network import *
+from population import Population
+from innovator import setup_innovations
+from entity import Entity
+from species import Species
+from network import Network
+from node import Connection
 
-class Neat:
+class Neat(object):
+
+    __isfrozen = False
+
 
     def __init__(self, io, entity, size, config=None, verbose=True):
-        self.entity = entity
-        self.check_entity()
+
+        setup_innovations(io)
+        
+        self.__entity = entity
+        self.__io = io
+        self.__config = config
+        self.__stop_condition = None
+        self.__solved = False
+        self.__solvers = []
+        self.__verbose = verbose
+        self.__pop = Population(io, self.__entity, size)
+
+        self.__setup()
+        self.__check_entity()
+
+        self.__isfrozen = True
 
         
-        self.io = io
-
-        self.config = config
-
-        self.setup()
         
-        self.stop_condition = None
-        self.solved = False
-        self.solvers = []
+    # Properties
 
-        self.verbose = verbose
-        
-        setup_innovations(io[0], io[1])
+    @property
+    def population(self):
+        return self.__pop
 
-        self.pop = Population(io, entity, size)
-        
-    def check_entity(self):
-        if not issubclass(self.entity, Entity):
-            raise Exception("entity must be a subclass of Entity")
+    @property
+    def solvers(self):
+        return self.__solvers
 
-        fitness_func = getattr(self.entity, "calc_fitness", None)
-        if not callable(fitness_func):
-            raise Exception("entity must implement 'calc_fitness' function")
-        
+    @property
+    def stop_condition(self):
+        return self.__stop_condition
+
+    @stop_condition.setter
+    def stop_condition(self, function):
+        self.__stop_condition = function
+
+
+    # Publics
+
+    def is_solved(self):
+        if self.__stop_condition == None:
+            if self.__verbose:
+                print("Warning: NEAT Object without stop condition cannot be solved")
+        return self.__solved
+
     def next(self):
-        self.pop.natural_selection()
-        if self.verbose:
-            s  = "| Gen : {} ".format(str(self.pop.gen).ljust(3))
-            s += "| No. Species : {} ".format(str(len(self.pop.species)).ljust(3))
-            s += "| Score : {} ".format("{:.2f}".format(self.pop.gen_fitness).ljust(8))
-            s += "| HighScore : {} ".format("{:.2f}".format(self.pop.best_fitness).ljust(8))
-            #s += "| No. Entities : {} ".format(str(len(self.pop.population)).ljust(3))
+        '''
+        Runs the next iteration of natural selection.
+        If verbose was set to True, information about the generation is displayed
+        '''
+        
+        self.__pop.natural_selection()
+        if self.__verbose:
+            s  = "| Gen : {} ".format(str(self.__pop.gen).ljust(3))
+            s += "| No. Species : {} ".format(str(len(self.__pop.species)).ljust(3))
+            s += "| Score : {} ".format("{:.2f}".format(self.__pop.gen_fitness).ljust(8))
+            s += "| HighScore : {} ".format("{:.2f}".format(self.__pop.best_fitness).ljust(8))
             print(s)
         
 
     def run(self, iterations = 'inf'):
+        '''
+        Runs the specified number of iterations of natural selections through next().
+
+        Parameters:
+                    iterations (int): number of iterations (default = inf)
+
+        '''
         if iterations == 'inf':
-            if self.stop_condition == None:
+            if self.__stop_condition == None:
                 raise Exception("stop condition required for run")
-            while not self.solved:
+            while not self.__solved:
                 self.next()
-                if self.stop_condition != None:
-                    for spec in self.pop.species:
+                if self.__stop_condition != None:
+                    for spec in self.__pop.species:
                         e = spec.entities[0]
-                        result = self.stop_condition(e)
+                        result = self.__stop_condition(e)
                         if result:
-                            self.solvers.append(e)
-                        self.solved = self.solved or result
+                            self.__solvers.append(e)
+                        self.__solved = self.__solved or result
             print("SOLVED...")
         else:
             for i in range(iterations):
                 self.next()
                 
 
-    def setup(self):
+
+    # Privates
+        
+    def __check_entity(self):
+        if not issubclass(self.__entity, Entity):
+            raise Exception("entity must be a subclass of Entity")
+
+        fitness_func = getattr(self.__entity, "calc_fitness", None)
+        if not callable(fitness_func):
+            raise Exception("entity must implement 'calc_fitness' function")
+        
+    
+    def __setup(self):
         self.default_config = {
     
                 # MUTATION RATES
@@ -87,7 +132,7 @@ class Neat:
                 # NATURAL SELECTION
                 'elite' : 2,
                 'stale_species' : 15,
-                'stale_pop' : 20,
+                'stale__pop' : 20,
 
                 # WEIGHTS
                 'weight_upper_bound' : 3,
@@ -98,10 +143,10 @@ class Neat:
                 # RECURRENT NETWORK
                 'recurrent': False
         }
-        self.configure(self.default_config)
-        if self.config != None: self.configure(self.config)
+        self.__configure(self.default_config)
+        if self.__config != None: self.__configure(self.__config)
         
-    def configure(self, config):
+    def __configure(self, config):
        
         if 'weight_mut' in config: Network.W_MUT = config['weight_mut']
         if 'connection_mut' in config: Network.C_MUT = config['connection_mut']
@@ -119,7 +164,7 @@ class Neat:
 
         if 'elite' in config: Population.ELITE = config['elite']
         if 'stale_species' in config: Population.STALE_SPEC = config['stale_species']
-        if 'stale_pop' in config: Population.STALE_POP = config['stale_pop']
+        if 'stale__pop' in config: Population.STALE__pop = config['stale__pop']
 
         if 'weight_upper_bound' in config: Connection.WEIGHT_UB = config['weight_upper_bound']
         if 'weight_lower_bound' in config: Connection.WEIGHT_LB = config['weight_lower_bound']
@@ -127,11 +172,22 @@ class Neat:
 
         if 'recurrent' in config: Network.RECURRENT = config['recurrent']
 
-    def __getitem__(self, key):
-        return self.pop.population[key]
-
+    # Magics
+    
     def __repr__(self):
-        return repr(self.pop)
+        return repr(self.__pop)
+
+    def __call__(self):
+        self.run()
+
+    def __getattr__(self, name):
+        print("Atrribute {} does not exist".format(name))
+
+    def __setattr__(self, name, val):
+        if self.__isfrozen and not hasattr(self, name):
+            print("Atrribute {} does not exist".format(name))
+        object.__setattr__(self, name, val)
+        
         
 
 

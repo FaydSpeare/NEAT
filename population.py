@@ -1,5 +1,5 @@
-from species import *
-from entity import *
+from species import Species
+from entity import Entity
 import math
 
 class Population(object):
@@ -7,6 +7,7 @@ class Population(object):
     ELITE = 2
     STALE_SPEC = 15
     STALE_POP = 20
+
 
     def __init__(self, io, entity, size):
         self.io = io
@@ -32,7 +33,7 @@ class Population(object):
             self.population.append(entity)
 
     def natural_selection(self):
-        random.seed(a=None)
+        #random.seed(a=None)
                     
         self.speciate()
         self.calculate_fitness()
@@ -88,7 +89,7 @@ class Population(object):
             suitable_species = False
             
             for spec in self.species:
-                if are_compatible(spec.standard, entity.brain):
+                if Species.are_compatible(spec.standard, entity.brain):
                     spec.add(entity)
                     suitable_species = True
                     break
@@ -138,6 +139,9 @@ class Population(object):
         for spec in self.species:
             string += repr(spec)
         return string
+
+    def __getitem__(self, item):
+        return self.population[item]
         
         
                     

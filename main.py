@@ -7,7 +7,7 @@ config = {
     # MUTATION RATES
     'weight_mut' : 0.95,
     'connection_mut' : 0.1,
-    'node_mut' : 0.05,
+    'node_mut' : 0.01,
     'random_weight' : 0.1,
     
     # SPECIES DIFFERENTIATION
@@ -19,7 +19,7 @@ config = {
     'dup-parent' : 0.25,
     'weak-parent-weight' : 0.5,
     'gene-enable' : 0.75,
-
+    
     # NATURAL SELECTION
     'elite' : 2,
     'stale_species' : 15,
@@ -28,7 +28,7 @@ config = {
     # WEIGHTS
     'weight_upper_bound' : 3,
     'weight_lower_bound' : -3,
-    'weight_step' : 0.01,
+    'weight_step' : 0.03,
     'weight_distr' : ('gaussian', 0, 1),
 
     # RECURRENT NETWORK
@@ -51,7 +51,8 @@ neat = Neat(io, Player, size, config)
 ## ADD ASSESSMENT FUNCTION TO NEAT
 neat.stop_condition = xor_assessment
 
-#neat.run()
+neat.run()
+
 
 
 
