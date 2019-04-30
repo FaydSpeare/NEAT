@@ -11,6 +11,8 @@ class Node(object):
         self.in_val = 0
         self.out_val = 0
 
+        self.recurrent_in_val = 0
+
     def is_input(self):
         return isinstance(self, Input)
 
@@ -41,11 +43,13 @@ class Output(Node):
         super().__init__(1, num)
 
     def activate(self):
+        self.in_val += self.recurrent_in_val
         try:
             ans = math.exp(-4.9*self.in_val)
         except OverflowError:
             ans = float('inf')
         self.out_val = 1 / (1 + ans)
+        self.recurrent_in_val = 0
 
     def replicate(self):
         node = Output(self.num)
@@ -58,11 +62,13 @@ class Hidden(Node):
         super().__init__(None, num)
 
     def activate(self):
+        self.in_val += self.recurrent_in_val
         try:
             ans = math.exp(-4.9*self.in_val)
         except OverflowError:
             ans = float('inf')
         self.out_val = 1 / (1 + ans)
+        self.recurrent_in_val = 0
     
     def replicate(self):
         node = Hidden(self.num)
@@ -95,13 +101,21 @@ class Connection(object):
         self.input = input
         self.output = output
 
+        
+        self.recurrent = False
+        if self.input == self.output:
+            self.recurrent = True
+
         self.weight = self.rand()
         self.enabled = True
         self.num = num
 
     def feed(self):
         if self.enabled:
-            self.output.in_val += self.input.out_val * self.weight
+            if self.recurrent:
+                self.output.recurrent_in_val += self.input.out_val * self.weight
+            else:
+                self.output.in_val += self.input.out_val * self.weight
 
     def mutate_weight(self):
         if random.random() < Connection.RANDOM_WEIGHT:

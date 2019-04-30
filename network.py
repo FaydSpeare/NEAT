@@ -8,6 +8,8 @@ class Network(object):
     C_MUT = 0.1
     N_MUT = 0.01
 
+    RECURRENT = False
+
     def next_node_innov(self):
         self.node_innov += 1
         return self.node_innov-1
@@ -91,22 +93,16 @@ class Network(object):
             node.activate()
             for conn in self.node_conns[node]:
                 conn.feed()
-            #node.in_val = 0
-            #node.out_val = 0
 
         for i in range(self.hidden_layers):
             for node in self.hiddens[i+1]:
                 node.activate()
                 for conn in self.node_conns[node]:
                     conn.feed()
-                #node.in_val = 0
-                #node.out_val = 0
 
         for node in self.outputs:
             node.activate()
             results.append(node.out_val)
-            #node.in_val = 0
-            #node.out_val = 0
 
         for node in self.nodes:
             node.out_val = 0
@@ -186,10 +182,11 @@ class Network(object):
         input_node = random.choice(self.nodes)
         output_node = random.choice(self.nodes)
 
-        while ((input_node.layer == output_node.layer) or (self.is_connection(input_node, output_node)))and attempts < 50:
+        while ((input_node.layer == output_node.layer) or(self.is_connection(input_node, output_node)))and attempts < 50:
             input_node = random.choice(self.nodes)
             output_node = random.choice(self.nodes)
             attempts += 1
+            
 
         if attempts == 50:
             #print("failed attempt=50")
@@ -204,7 +201,6 @@ class Network(object):
         self.connections.append(conn)
 
         self.node_conns[input_node].append(conn)
-
         #print("success attempt=", attempts)
 
     def is_connection(self, n1, n2):

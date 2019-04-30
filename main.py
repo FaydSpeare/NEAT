@@ -28,7 +28,9 @@ config = {
     'weight_upper_bound' : 3,
     'weight_lower_bound' : -3,
     'weight_step' : 0.01,
-    'weight_distr' : ('gaussian', 0, 1)
+    'weight_distr' : ('gaussian', 0, 1),
+
+    'recurrent' : False    
 
 }
 
@@ -36,7 +38,7 @@ config = {
 io = (2, 1)
 
 # Population Size
-size = 50
+size = 100
 
 # PLAYER SUBCLASS OF ENTITY
 Player = XOR
@@ -48,6 +50,7 @@ neat = Neat(io, Player, size, config)
 neat.stop_condition = xor_assessment
 
 neat.run()
+
 
 
 

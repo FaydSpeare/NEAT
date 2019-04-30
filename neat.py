@@ -62,29 +62,63 @@ class Neat:
 
     def configure(self):
         
-        if self.config != None:
-            config = self.config
+        if self.config == None:
+            self.config = config = {
+    
+                # MUTATION RATES
+                'weight_mut' : 0.95,
+                'connection_mut' : 0.1,
+                'node_mut' : 0.05,
+                'random_weight' : 0.1,
+                
+                # SPECIES DIFFERENTIATION
+                'threshold' : 3.0,
+                'disjoint' : 1.0,
+                'weights' : 0.5,
+
+                # CROSSOVER
+                'dup-parent' : 0.25,
+                'weak-parent-weight' : 0.5,
+                'gene-enable' : 0.75,
+
+                # NATURAL SELECTION
+                'elite' : 2,
+                'stale' : 15,
+
+                # WEIGHTS
+                'weight_upper_bound' : 3,
+                'weight_lower_bound' : -3,
+                'weight_step' : 0.01,
+                'weight_distr' : ('gaussian', 0, 1),
+
+                # RECURRENT NETWORK
+                'recurrent': False
+            }
             
-            if 'weight_mut' in config: Network.W_MUT = config['weight_mut']
-            if 'connection_mut' in config: Network.C_MUT = config['connection_mut']
-            if 'node_mut' in config: Network.N_MUT = config['node_mut']
-            if 'random_weight' in config: Connection.W_MUT = config['random_weight']
-            if 'weight_step' in config: Connection.WEIGHT_STEP = config['weight_step']
-            
-            if 'threshold' in config: Species.THRESHOLD = config['threshold']
-            if 'disjoint' in config: Species.ED_COEFF = config['disjoint']
-            if 'weights' in config: Species.W_COEFF = config['weights']
+        config = self.config
+        
+        if 'weight_mut' in config: Network.W_MUT = config['weight_mut']
+        if 'connection_mut' in config: Network.C_MUT = config['connection_mut']
+        if 'node_mut' in config: Network.N_MUT = config['node_mut']
+        if 'random_weight' in config: Connection.W_MUT = config['random_weight']
+        if 'weight_step' in config: Connection.WEIGHT_STEP = config['weight_step']
+        
+        if 'threshold' in config: Species.THRESHOLD = config['threshold']
+        if 'disjoint' in config: Species.ED_COEFF = config['disjoint']
+        if 'weights' in config: Species.W_COEFF = config['weights']
 
-            if 'dup_parent' in config: Species.DUP_PARENT = config['dup_parent']
-            if 'weak-parent_weight' in config: Species.PARENT_WEIGHT = config['weak-parent_weight']
-            if 'gene_enable' in config: Species.GENE_ENABLE = config['gene_enable']
+        if 'dup_parent' in config: Species.DUP_PARENT = config['dup_parent']
+        if 'weak-parent_weight' in config: Species.PARENT_WEIGHT = config['weak-parent_weight']
+        if 'gene_enable' in config: Species.GENE_ENABLE = config['gene_enable']
 
-            if 'elite' in config: Population.ELITE = config['elite']
-            if 'stale' in config: Population.STALE = config['stale']
+        if 'elite' in config: Population.ELITE = config['elite']
+        if 'stale' in config: Population.STALE = config['stale']
 
-            if 'weight_upper_bound' in config: Connection.WEIGHT_UB = config['weight_upper_bound']
-            if 'weight_lower_bound' in config: Connection.WEIGHT_LB = config['weight_lower_bound']
-            if 'weight_distr' in config: Connection.WEIGHT_DIST = config['weight_distr']
+        if 'weight_upper_bound' in config: Connection.WEIGHT_UB = config['weight_upper_bound']
+        if 'weight_lower_bound' in config: Connection.WEIGHT_LB = config['weight_lower_bound']
+        if 'weight_distr' in config: Connection.WEIGHT_DIST = config['weight_distr']
+
+        if 'recurrent' in config: Network.RECURRENT = config['recurrent']
 
 
             
