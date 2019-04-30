@@ -15,7 +15,7 @@ class Neat:
 
         self.config = config
 
-        self.configure()
+        self.setup()
         
         self.stop_condition = None
         self.solved = False
@@ -46,24 +46,27 @@ class Neat:
             print(s)
         
 
-    def run(self):
-        if self.stop_condition == None:
-            raise Exception("stop condition required for run")
-        while not self.solved:
-            self.next()
-            if self.stop_condition != None:
-                for spec in self.pop.species:
-                    e = spec.entities[0]
-                    result = self.stop_condition(e)
-                    if result:
-                        self.solvers.append(e)
-                    self.solved = self.solved or result
-        print("SOLVED...")
+    def run(self, iterations = 'inf'):
+        if iterations == 'inf':
+            if self.stop_condition == None:
+                raise Exception("stop condition required for run")
+            while not self.solved:
+                self.next()
+                if self.stop_condition != None:
+                    for spec in self.pop.species:
+                        e = spec.entities[0]
+                        result = self.stop_condition(e)
+                        if result:
+                            self.solvers.append(e)
+                        self.solved = self.solved or result
+            print("SOLVED...")
+        else:
+            for i in range(iterations):
+                self.next()
+                
 
-    def configure(self):
-        
-        if self.config == None:
-            self.config = config = {
+    def setup(self):
+        self.default_config = {
     
                 # MUTATION RATES
                 'weight_mut' : 0.95,
@@ -83,7 +86,8 @@ class Neat:
 
                 # NATURAL SELECTION
                 'elite' : 2,
-                'stale' : 15,
+                'stale_species' : 15,
+                'stale_pop' : 20,
 
                 # WEIGHTS
                 'weight_upper_bound' : 3,
@@ -93,10 +97,12 @@ class Neat:
 
                 # RECURRENT NETWORK
                 'recurrent': False
-            }
-            
-        config = self.config
+        }
+        self.configure(self.default_config)
+        if self.config != None: self.configure(self.config)
         
+    def configure(self, config):
+       
         if 'weight_mut' in config: Network.W_MUT = config['weight_mut']
         if 'connection_mut' in config: Network.C_MUT = config['connection_mut']
         if 'node_mut' in config: Network.N_MUT = config['node_mut']
@@ -112,13 +118,21 @@ class Neat:
         if 'gene_enable' in config: Species.GENE_ENABLE = config['gene_enable']
 
         if 'elite' in config: Population.ELITE = config['elite']
-        if 'stale' in config: Population.STALE = config['stale']
+        if 'stale_species' in config: Population.STALE_SPEC = config['stale_species']
+        if 'stale_pop' in config: Population.STALE_POP = config['stale_pop']
 
         if 'weight_upper_bound' in config: Connection.WEIGHT_UB = config['weight_upper_bound']
         if 'weight_lower_bound' in config: Connection.WEIGHT_LB = config['weight_lower_bound']
         if 'weight_distr' in config: Connection.WEIGHT_DIST = config['weight_distr']
 
         if 'recurrent' in config: Network.RECURRENT = config['recurrent']
+
+    def __getitem__(self, key):
+        return self.pop.population[key]
+
+    def __repr__(self):
+        return repr(self.pop)
+        
 
 
             

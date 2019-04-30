@@ -11,9 +11,9 @@ config = {
     'random_weight' : 0.1,
     
     # SPECIES DIFFERENTIATION
-    'threshold' : 3.0,
+    'threshold' : 4.0,
     'disjoint' : 1.0,
-    'weights' : 0.5,
+    'weights' : 3.0,
 
     # CROSSOVER
     'dup-parent' : 0.25,
@@ -22,7 +22,8 @@ config = {
 
     # NATURAL SELECTION
     'elite' : 2,
-    'stale' : 15,
+    'stale_species' : 15,
+    'stale_pop': 20,
 
     # WEIGHTS
     'weight_upper_bound' : 3,
@@ -30,6 +31,7 @@ config = {
     'weight_step' : 0.01,
     'weight_distr' : ('gaussian', 0, 1),
 
+    # RECURRENT NETWORK
     'recurrent' : False    
 
 }
@@ -49,7 +51,7 @@ neat = Neat(io, Player, size, config)
 ## ADD ASSESSMENT FUNCTION TO NEAT
 neat.stop_condition = xor_assessment
 
-neat.run()
+#neat.run()
 
 
 

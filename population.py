@@ -5,7 +5,8 @@ import math
 class Population(object):
 
     ELITE = 2
-    STALE = 15
+    STALE_SPEC = 15
+    STALE_POP = 20
 
     def __init__(self, io, entity, size):
         self.io = io
@@ -43,7 +44,7 @@ class Population(object):
         # kill stale and bad species
 
         for spec in self.species:
-            if spec.stale > Population.STALE and (self.species.index(spec) + 1) >= Population.ELITE:
+            if spec.stale > Population.STALE_SPEC and (self.species.index(spec) + 1) >= Population.ELITE:
                 self.species.remove(spec)
 
         fitness_sum = self.get_average_sum()
@@ -57,7 +58,7 @@ class Population(object):
             return True
 
         children = []
-        if self.stale > 20 and len(self.species) > 1:
+        if self.stale > Population.STALE_POP and len(self.species) > 1:
             no_of_children = math.floor(self.size/2)-1
             for i in range(no_of_children):
                     children.append(self.species[0].progeny())
@@ -130,6 +131,13 @@ class Population(object):
         for spec in self.species:
             total += spec.get_average_fitness()
         return total
+
+    def __repr__(self):
+        string = ""
+        string += "Total Pop: {}\n".format(len(self.population))
+        for spec in self.species:
+            string += repr(spec)
+        return string
         
         
                     

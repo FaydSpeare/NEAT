@@ -53,12 +53,12 @@ class Species:
 
     def share_fitness(self):
         for e in self.entities:
-            e.fitness /= len(self.entities)
+            e.shared_fitness = e.fitness / len(self.entities)
 
     def get_average_fitness(self):
         total = 0
         for e in self.entities:
-            total += e.fitness
+            total += e.shared_fitness
         return total / len(self.entities)
 
     def select_parent(self):
@@ -93,6 +93,14 @@ class Species:
                 progeny = parent1.child(brain)
         progeny.mutate()
         return progeny
+
+    def __repr__(self):
+        string = ""
+        string += "Species " + str(self.innov) + ": \n"
+        for e in self.entities:
+            string += "    "
+            string += repr(e) + "\n"
+        return string
 
 def are_compatible(net1, net2):
     e_and_d = excess_and_disjoint(net1, net2)
@@ -154,4 +162,6 @@ def weight_diff(net1, net2):
     if matched == 0:
         return 100
     return total/matched
+
+
     

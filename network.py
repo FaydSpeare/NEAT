@@ -216,9 +216,9 @@ class Network(object):
 
     def randomise_weights(self):
         for conn in self.connections:
-            conn.weight = random.gauss(0, 1)
+            conn.weight = conn.rand()
         for conn in self.bias_connections:
-            conn.weight = random.gauss(0, 1)
+            conn.weight = conn.rand()
 
     def mutate(self):
         if random.random() < Network.W_MUT:

@@ -12,6 +12,8 @@ class Entity(object):
             self.brain = net
 
         self.fitness = 0
+        self.shared_fitness = 0
+        self.solved = False
 
     def think(self, vision):
         return self.brain.feed_forward(vision)
@@ -24,6 +26,9 @@ class Entity(object):
 
     def child(self, net):
         return self.__class__(self.io, net)
+
+    def __repr__(self):
+        return "Entity: {{ Fitness={:.2f} , Hidden_Nodes={} }}".format(float(self.fitness), len(self.brain.hiddens))
 
         
         
